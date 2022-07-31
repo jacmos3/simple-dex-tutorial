@@ -61,9 +61,9 @@ contract Exchange {
 	}
 
 	function depositToken(address _token, uint256 _amount) public{
-		require(_token != ETHER);
+		require(_token != ETHER,"manueeeeeeeeeeeeeeeeeeeeeee");
 		address _sender = msg.sender;
-		require(Token(_token).transferFrom(_sender, address(this), _amount));
+		require(Token(_token).transferFrom(_sender, address(this), _amount),"not possible");
 		tokens[_token][_sender] = tokens[_token][_sender].add(_amount);
 		emit Deposit(_token, _sender, _amount, tokens[_token][_sender]);
 	}
