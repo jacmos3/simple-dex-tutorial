@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
 import './App.css';
 import Web3 from 'web3'
-import Token from '../abis/Token.json'
+import {connect } from 'react-redux'
+import {
+    loadWeb3,
+    loadAccount,
+    loadToken,
+    loadExchange
+} from '../store/interactions'
 
 class App extends Component {
   componentDidMount() {
-    this.loadBlockchainData()
+    this.loadBlockchainData(this.props.dispatch)
   }
 
-  async loadBlockchainData() {
-    const web3 = new Web3(window.ethereum) 
+  async loadBlockchainData(dispatch) {
+    const web3 = await loadWeb3(dispatch);
     window.ethereum.enable().catch(
       error => { 
         // User denied account access 
@@ -17,11 +23,12 @@ class App extends Component {
       })
     const networkId = await web3.eth.net.getId();
     
-    const accounts = await web3.eth.getAccounts()
+    const accounts = await loadAccount(web3, dispatch)
 
-    const token = new web3.eth.Contract(Token.abi, Token.networks[networkId].address)
-    const totalSupply = await token.methods.totalSupply().call()
-    console.log("totalSupply", totalSupply)
+    const token = await loadToken(web3, networkId, dispatch);
+    loadExchange(web3, networkId, dispatch)
+    //const totalSupply = await token.methods.totalSupply().call()
+    //console.log("totalSupply", totalSupply)
   }
 
   render() {
@@ -114,5 +121,9 @@ class App extends Component {
     );
   }
 }
-
-export default App;
+function mapStateToProps(state){
+  return{
+    //TODO: Fill me in...
+  }
+}
+export default connect(mapStateToProps)(App);
