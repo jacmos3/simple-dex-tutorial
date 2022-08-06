@@ -24,6 +24,12 @@ function exchange(state = {}, action){
 	switch (action.type){
 		case 'EXCHANGE_LOADED':
 			return {...state, contract: action.contract, loaded: true};
+		case 'CANCELLED_ORDERS_LOADED':
+			return {...state, cancelledOrders: {data: action.cancelledOrders, loaded: true}}
+		case 'FILLED_ORDERS_LOADED':
+			return {...state, filledOrders: {data: action.filledOrders, loaded: true}}
+		case 'ALL_ORDERS_LOADED':
+			return {...state, allOrders: {data: action.allOrders, loaded: true}}
 		default:
 			return state
 	}

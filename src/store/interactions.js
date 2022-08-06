@@ -3,7 +3,10 @@ import {
 	web3Loaded,
 	web3AccountLoaded,
 	tokenLoaded,
-	exchangeLoaded
+	exchangeLoaded,
+  cancelledOrdersLoaded,
+  filledOrdersLoaded,
+  allOrdersLoaded
 } from './actions';
 import Token from '../abis/Token.json';
 import Exchange from '../abis/Exchange.json';
@@ -52,4 +55,44 @@ export const loadExchange = async (web3, networkId, dispatch) => {
     //window.alert('Exchange contract not deployed to the current network. Please select another network with Metamask.')
     return null;
   }
+}
+
+export const loadAllOrders = async (exchange, dispatch) => {
+  if (exchange != undefined){
+    //Fetch cancelled orders with the "Cancel" event stream
+    const cancelStream = await exchange.getPastEvents('Cancel', {fromBlock:0, toBlock:'latest'});
+    
+    //Format cancelled orders
+    const cancelledOrders = cancelStream.map((event) => event.returnValues);
+    console.log(cancelledOrders);
+
+    //Add cancelled orders to the redux store
+    dispatch(cancelledOrdersLoaded(cancelledOrders));
+
+    //Fetch filled orders with the Trade wvent stream
+    const tradeStream = await exchange.getPastEvents('Trade', {fromBlock:0, toBlock:'latest'});
+    
+    //Format filled orders
+    const filledOrders = await tradeStream.map((event) => event.returnValues);
+
+    //Add cancelled orders to the redux store
+    dispatch(filledOrdersLoaded(filledOrders));
+
+    //Load order stream
+    const orderStream = await exchange.getPastEvents('Order', {fromBlock:0, toBlock:'latest'});
+    
+    //Format order orders
+    const allOrder = await orderStream.map((event) => event.returnValues);
+
+    //Add cancelled orders to the redux store
+    dispatch(allOrdersLoaded(allOrder));
+
+     
+  }
+  else{
+    console.log("cannot load orders because exchange address undefined")
+  }
+  //Fetch filled orders with the "Trade" event stream
+
+  //Fetch all orders with the "Order" event stream
 }
