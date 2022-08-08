@@ -57,10 +57,24 @@ export function orderCancelling(){
 	}
 }
 
-// 
+
 export function orderCancelled(order){
 	return{
 		type: 'ORDER_CANCELLED',
+		order
+	}
+}
+
+// Fill Order
+export function orderFilling(){
+	return{
+		type: 'ORDER_FILLING'
+	}
+}
+
+export function orderFilled(order){
+	return{
+		type: 'ORDER_FILLED',
 		order
 	}
 }

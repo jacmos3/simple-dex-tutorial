@@ -71,7 +71,7 @@ const decorateOrder = (order) => {
 	let etherAmount;
 	let tokenAmount;
 
-	if (order.tokenGive == ETHER_ADDRESS){
+	if (order.tokenGive === ETHER_ADDRESS){
 		etherAmount = order.amountGive;
 		tokenAmount = order.amountGet;
 	}
@@ -176,8 +176,8 @@ const decorateOrderBookOrder = (order) => {
 	return ({
 		...order,
 		orderType,
-		orderTypeClass: (orderType == 'buy' ? GREEN : RED),
-		orderFillClass: orderType === 'buy' ? 'sell' : 'buy'
+		orderTypeClass: (orderType === 'buy' ? GREEN : RED),
+		orderFillAction: orderType === 'buy' ? 'sell' : 'buy'
 	});
 }
 
@@ -187,7 +187,7 @@ export const myFilledOrdersSelector = createSelector(
 	filledOrders,
 	(account, orders) => {
 		// Find our orders
-		orders = orders.filter((o) => o.user === account || o.userFill == account);
+		orders = orders.filter((o) => o.user === account || o.userFill === account);
 
 		// Sort by date ascending
 		orders = orders.sort((a,b) => a.timestamp - b.timestamp);
@@ -284,7 +284,7 @@ export const priceChartSelector = createSelector(
 		const lastPrice = get(lastOrder, 'tokenPrice', 0);
 
 		// get second order price
-		const secondLastPrice = get(secondLastPrice, 'tokenPrice', 0);
+		const secondLastPrice = get(secondLastOrder, 'tokenPrice', 0);
 		
 		return({
 			lastPrice,
@@ -323,3 +323,6 @@ const buildGraphData = (orders) => {
 
 const orderCancelling = state => get(state, 'exchange.orderCancelling', false);
 export const orderCancellingSelector = createSelector(orderCancelling, (status) => {return status});
+
+const orderFilling = state => get(state, 'exchange.orderFilling', false);
+export const orderFillingSelector = createSelector(orderFilling, (status) => {return status});

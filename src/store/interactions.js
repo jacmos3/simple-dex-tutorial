@@ -8,7 +8,9 @@ import {
   filledOrdersLoaded,
   allOrdersLoaded,
   orderCancelling,
-  orderCancelled
+  orderCancelled,
+  orderFilling,
+  orderFilled
 } from './actions';
 import Token from '../abis/Token.json';
 import Exchange from '../abis/Exchange.json';
@@ -60,7 +62,7 @@ export const loadExchange = async (web3, networkId, dispatch) => {
 }
 
 export const loadAllOrders = async (exchange, dispatch) => {
-  if (exchange != undefined){
+  if (exchange !== undefined){
     //Fetch cancelled orders with the "Cancel" event stream
     const cancelStream = await exchange.getPastEvents('Cancel', {fromBlock:0, toBlock:'latest'});
     
@@ -100,6 +102,19 @@ export const loadAllOrders = async (exchange, dispatch) => {
 }
 
 
+//it subscribes to the event for refreshing the page after the event occurs
+export const subscribeToEvents = async (exchange, dispatch) => {
+  // When a Cancel event occurs, it will be triggered "orderCancelled()" method
+  await exchange.events.Cancel({}, (error, event) =>{
+    dispatch(orderCancelled(event.returnValues));
+  });
+
+  // When a Trade event occurs, it will be triggered "orderFilled()" method
+  await exchange.events.Trade({}, (error, event) =>{
+    dispatch(orderFilled(event.returnValues));
+  })
+}
+
 export const cancelOrder = (dispatch, exchange, order, account) => {
   exchange.methods.cancelOrder(order.id)
     .send({from:account})
@@ -113,8 +128,15 @@ export const cancelOrder = (dispatch, exchange, order, account) => {
     })
 }
 
-export const subscribeToEvents = async (exchange, dispatch) => {
-  await exchange.events.Cancel({}, (error, event) =>{
-    dispatch(orderCancelled(event.returnValues));
-  })
+export const fillOrder = (dispatch, exchange, order, account) => {
+  exchange.methods.fillOrder(order.id)
+    .send({from:account})
+    .on('transactionHash', (hash) => {
+      console.log("transactionHash");
+      dispatch(orderFilling());
+    })
+    .on('error', (error) =>{
+      //console.log(error);
+      window.alert('There was an error');
+    })
 }
