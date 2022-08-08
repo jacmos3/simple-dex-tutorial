@@ -30,6 +30,20 @@ function exchange(state = {}, action){
 			return {...state, filledOrders: {data: action.filledOrders, loaded: true}}
 		case 'ALL_ORDERS_LOADED':
 			return {...state, allOrders: {data: action.allOrders, loaded: true}}
+		case 'ORDER_CANCELLING':
+			return {...state, orderCancelling: true}
+		case 'ORDER_CANCELLED':
+			return {
+				...state, 
+				orderCancelling: false, 
+				cancelledOrders: { 
+					...state.cancelledOrders, 
+					data:[
+						...state.cancelledOrders.data,
+						action.order
+					]
+				}
+			}
 		default:
 			return state
 	}
@@ -43,3 +57,5 @@ const rootReducer = combineReducers({
 })
 
 export default rootReducer;
+
+
